@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GDIRO - Déclaration d'Incident Risque Opérationnel</title>
+<style>
+:root{
+  --primary:#0047ab;--primary-dark:#00337c;--secondary:#e6f0ff;--success:#059669;--warning:#d97706;
+  --danger:#dc2626;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--text:#1e293b;--muted:#64748b;
+}
+*{box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:var(--text);background:#f5f7fb;margin:0;padding:20px;line-height:1.55;}
+.container{max-width:1300px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 0 24px rgba(0,0,0,.08);overflow:hidden;}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:1.8rem 2rem;text-align:center;position:relative;}
+.header h1{font-size:1.7rem;margin:0 0 6px;}
+.header p{opacity:.9;font-size:.95rem;margin:0;}
+.version-badge{position:absolute;top:12px;right:14px;background:var(--success);color:#fff;padding:4px 10px;border-radius:14px;font-size:.7rem;font-weight:800;}
+.confidential-banner{background:var(--warning);color:#9933fff03;padding:.7rem 1.5rem;font-weight:700;text-align:center;font-size:.85rem;}
+.storage-banner{background:#eef2ff;color:#3730a3;padding:.55rem 1.5rem;font-size:.78rem;text-align:center;border-bottom:1px solid #c7d2fe;}
+.nav-tabs{display:flex;background:var(--gray-100);border-bottom:1px solid var(--gray-200);flex-wrap:wrap;}
+.nav-tab{padding:1rem 1.4rem;cursor:pointer;border-bottom:3px solid transparent;font-weight:600;font-size:.9rem;color:var(--muted);transition:.2s;}
+.nav-tab:hover{background:var(--gray-200);}
+.nav-tab.active{border-bottom-color:var(--primary);color:var(--primary);background:#fff;}
+.reference-bar{background:var(--gray-100);padding:.7rem 1.5rem;display:flex;justify-content:space-between;font-weight:700;font-size:.85rem;color:var(--muted);border-bottom:1px solid var(--gray-200);flex-wrap:wrap;gap:8px;}
+.tab-panel{display:none;padding:1.8rem;}
+.tab-panel.active{display:block;}
+.section{margin-bottom:1.3rem;background:#fff;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;}
+.section-title{background:var(--secondary);padding:.9rem 1.3rem;font-weight:700;font-size:1rem;color:var(--primary);border-left:4px solid var(--primary);cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
+.section-title:hover{background:#d1e0ff;}
+.section-content{padding:1.3rem;display:none;}
+.section-content.active{display:block;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.1rem;}
+.form-group{margin-bottom:0;}
+.form-group.full{grid-column:1/-1;}
+label{display:block;margin-bottom:6px;font-weight:600;font-size:.85rem;color:#495057;}
+label .req{color:var(--danger);}
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=datetime-local],input[type=date],select,textarea{
+  width:100%;padding:.6rem .75rem;border:1px solid var(--gray-300);border-radius:6px;font-size:.9rem;font-family:inherit;transition:.2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,71,171,.15);outline:none;}
+input.error,select.error,textarea.error{border-color:var(--danger);}
+.field-error{color:var(--danger);font-size:.78rem;margin-top:4px;display:none;}
+.field-error.active{display:block;}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:.9rem;margin-top:.3rem;}
+.checkbox-group label{font-weight:400;display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:.85rem;}
+.checkbox-group input{width:auto;}
+.btn{padding:.65rem 1.2rem;border:none;border-radius:7px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:.15s;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-success{background:var(--success);color:#fff;}
+.btn-outline{background:#fff;border:1px solid var(--gray-300);color:var(--muted);}
+.btn-outline:hover{background:var(--gray-100);}
+.btn-danger{background:#fef2f2;color:var(--danger);border:1px solid #fecaca;}
+.btn-import{background:#eef2ff;color:#4338ca;}
+.btn-export{background:#ecfdf5;color:var(--success);}
+.actions-bar{display:flex;gap:.8rem;flex-wrap:wrap;padding:1.2rem 1.8rem;background:var(--gray-100);border-top:1px solid var(--gray-200);position:sticky;bottom:0;}
+.toolbar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+#importFileInput{display:none;}
+table{width:100%;border-collapse:collapse;font-size:.85rem;}
+th{background:var(--gray-100);padding:.7rem .8rem;text-align:left;font-weight:700;color:var(--muted);border-bottom:2px solid var(--gray-200);white-space:nowrap;}
+td{padding:.7rem .8rem;border-bottom:1px solid var(--gray-200);vertical-align:top;}
+.badge{padding:2px 9px;border-radius:10px;font-size:.72rem;font-weight:700;}
+.badge-draft{background:#fef3c7;color:var(--warning);}
+.badge-submitted{background:#d1fae5;color:var(--success);}
+.badge-critique{background:#fee2e2;color:var(--danger);}
+.badge-eleve{background:#ffedd5;color:#c2410c;}
+.badge-moyen{background:#fef9c3;color:#a16207;}
+.badge-faible{background:#dcfce7;color:var(--success);}
+.filters-bar{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end;}
+.filters-bar .input-group{display:flex;flex-direction:column;gap:4px;}
+.filters-bar label{margin:0;font-size:.78rem;}
+.filters-bar select,.filters-bar input{padding:.5rem;border:1px solid var(--gray-300);border-radius:6px;font-size:.85rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--gray-100);border-radius:10px;padding:1.2rem;text-align:center;}
+.stat-value{font-size:1.7rem;font-weight:800;color:var(--primary);display:block;}
+.stat-label{font-size:.72rem;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.chart-box{background:#fff;border:1px solid var(--gray-200);border-radius:10px;padding:1.2rem;margin-bottom:1.3rem;}
+.empty-state{text-align:center;padding:2.5rem;color:var(--muted);}
+.notification-area{position:fixed;top:16px;right:16px;z-index:1000;max-width:360px;}
+.notification{padding:.9rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;margin-bottom:8px;box-shadow:0 8px 20px rgba(0,0,0,.15);opacity:0;transform:translateY(-10px);transition:.3s;color:#fff;}
+.notification.active{opacity:1;transform:translateY(0);}
+.notification.success{background:var(--success);}
+.notification.error{background:var(--danger);}
+.notification.info{background:var(--primary);}
+.footer{text-align:center;padding:1.3rem;color:var(--muted);font-size:.78rem;border-top:1px solid var(--gray-200);}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);z-index:2000;}
+@media print{.actions-bar,.toolbar,.nav-tabs,.filters-bar{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="notification-area" id="notification-area"></div>
+<div class="loading-overlay" id="loadingOverlay">Chargement du registre des incidents…</div>
+
+<div class="container">
+  <div class="header">
+        <h1> Système de Déclaration d'Incident Risque Opérationnel</h1>
+    <p>Conforme Bâle II/III et Circulaire BCT n°2006-19</p>
+  </div>
+  <div class="confidential-banner"> DOCUMENT CONFIDENTIEL — Diffusion restreinte aux personnes habilitées</div>
+  <div class="storage-banner"> Les déclarations et le journal d'audit sont enregistrés dans un espace <strong>partagé</strong> : toute personne utilisant cette fiche peut consulter, compléter ou exporter le registre.</div>
+
+  <div class="reference-bar">
+    <span>Référence en cours : <span id="ref-display">—</span></span>
+    <span>Statut : <span id="status-display">Brouillon</span></span>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-tab="declaration">📝 Déclaration</div>
+    <div class="nav-tab" data-tab="registre">📋 Registre & Export</div>
+    <div class="nav-tab" data-tab="dashboard">📊 Tableau de bord</div>
+    <div class="nav-tab" data-tab="audit">🔍 Journal d'audit</div>
+  </div>
+
+  <!-- ===================== ONGLET DECLARATION ===================== -->
+  <div class="tab-panel active" id="panel-declaration">
+
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">1. Identification & Détection <span>▾</span></div>
+      <div class="section-content active">
+        <div class="form-grid">
+          <div class="form-group"><label>Date/heure de survenance <span class="req">*</span></label>
+            <input type="datetime-local" id="incidentDatetime"><div class="field-error" id="err-incidentDatetime">Ce champ est obligatoire.</div></div>
+          <div class="form-group"><label>Date/heure de détection</label><input type="datetime-local" id="detectionDatetime"></div>
+          <div class="form-group"><label>Unité / Agence concernée <span class="req">*</span></label>
+            <input type="text" id="location" placeholder="Ex: Agence Sfax Centre"><div class="field-error" id="err-location">Ce champ est obligatoire.</div></div>
+          <div class="form-group"><label>Nom du déclarant <span class="req">*</span></label>
+            <input type="text" id="declarantName"><div class="field-error" id="err-declarantName">Ce champ est obligatoire.</div></div>
+          <div class="form-group"><label>Fonction du déclarant</label><input type="text" id="declarantFunction"></div>
+          <div class="form-group"><label>Contact (email / tél.)</label><input type="text" id="declarantContact" placeholder="email ou téléphone"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">2. Description de l'incident <span>▾</span></div>
+      <div class="section-content">
+        <div class="form-grid">
+          <div class="form-group full"><label>Description détaillée des faits <span class="req">*</span></label>
+            <textarea id="description" rows="4" placeholder="Contexte, chronologie, éléments constatés..."></textarea>
+            <div class="field-error" id="err-description">Ce champ est obligatoire (min. 20 caractères).</div></div>
+          <div class="form-group full"><label>Processus / Produit / Système concerné</label><input type="text" id="processConcerned"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">3. Classification Bâloise <span>▾</span></div>
+      <div class="section-content">
+        <div class="form-group full">
+          <label>Catégorie(s) d'événement de risque opérationnel (Bâle II) <span class="req">*</span></label>
+          <div class="checkbox-group" id="incidentTypesGroup">
+            <label><input type="checkbox" value="fraude-interne"> Fraude interne</label>
+            <label><input type="checkbox" value="fraude-externe"> Fraude externe</label>
+            <label><input type="checkbox" value="pratiques-emploi"> Pratiques d'emploi & sécurité au travail</label>
+            <label><input type="checkbox" value="clients-produits"> Clients, produits & pratiques commerciales</label>
+            <label><input type="checkbox" value="dommages-actifs"> Dommages aux actifs physiques</label>
+            <label><input type="checkbox" value="defaillance-systeme"> Interruption d'activité / défaillance système</label>
+            <label><input type="checkbox" value="erreur-operationnelle"> Exécution, livraison & gestion des processus</label>
+          </div>
+          <div class="field-error" id="err-incidentTypes">Sélectionnez au moins une catégorie.</div>
+        </div>
+        <div class="form-grid" style="margin-top:1.1rem;">
+          <div class="form-group"><label>Sévérité <span class="req">*</span></label>
+            <select id="severity">
+              <option value="">-- Sélectionner --</option>
+              <option value="faible">Faible</option>
+              <option value="moyen">Moyen</option>
+              <option value="eleve">Élevé</option>
+              <option value="critique">Critique</option>
+            </select><div class="field-error" id="err-severity">Ce champ est obligatoire.</div></div>
+          <div class="form-group"><label>Caractère de l'impact</label>
+            <select id="impactNature"><option value="avere">Avéré</option><option value="potentiel">Potentiel</option><option value="evite">Évité (quasi-incident)</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">4. Impact financier <span>▾</span></div>
+      <div class="section-content">
+        <div class="form-grid">
+          <div class="form-group"><label>Impact financier estimé (DT)</label><input type="number" id="financialImpact" min="0" step="1" placeholder="0"><div class="field-error" id="err-financialImpact">Montant invalide (0 à 10 000 000 DT).</div></div>
+          <div class="form-group"><label>Montant récupéré / recouvré (DT)</label><input type="number" id="recoveredAmount" min="0" step="1" placeholder="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">5. Causes & Plan d'action <span>▾</span></div>
+      <div class="section-content">
+        <div class="form-grid">
+          <div class="form-group full"><label>Causes identifiées</label><textarea id="causes" rows="3" placeholder="Cause racine, facteurs contributifs..."></textarea></div>
+          <div class="form-group full"><label>Mesures correctives / plan d'action</label><textarea id="correctiveActions" rows="3" placeholder="Actions engagées ou prévues, responsables, échéances..."></textarea></div>
+          <div class="form-group"><label>Statut du dossier</label>
+            <select id="dossierStatus"><option value="ouvert">Ouvert</option><option value="en-traitement">En traitement</option><option value="cloture">Clôturé</option></select></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="actions-bar" id="declarationActions">
+    <button class="btn btn-outline" onclick="newIncident()">🔄 Nouvelle déclaration</button>
+    <button class="btn btn-outline" onclick="saveDraft()">💾 Enregistrer le brouillon</button>
+    <button class="btn btn-primary" onclick="submitIncident()">✅ Soumettre la déclaration</button>
+  </div>
+
+  <!-- ===================== ONGLET REGISTRE ===================== -->
+  <div class="tab-panel" id="panel-registre">
+    <div class="toolbar">
+      <button class="btn btn-export" onclick="exportCSV()">⬇️ Exporter le registre (CSV)</button>
+      <button class="btn btn-import" onclick="document.getElementById('importFileInput').click()">⬆️ Importer un CSV</button>
+      <input type="file" id="importFileInput" accept=".csv" onchange="handleImportFile(event)">
+      <button class="btn btn-outline" onclick="refreshRegistre()">🔃 Actualiser</button>
+    </div>
+    <div class="filters-bar">
+      <div class="input-group"><label>Statut</label>
+        <select id="filterStatus" onchange="renderRegistre()">
+          <option value="">Tous</option><option value="draft">Brouillon</option><option value="submitted">Soumis</option>
+        </select></div>
+      <div class="input-group"><label>Sévérité</label>
+        <select id="filterSeverity" onchange="renderRegistre()">
+          <option value="">Toutes</option><option value="faible">Faible</option><option value="moyen">Moyen</option><option value="eleve">Élevé</option><option value="critique">Critique</option>
+        </select></div>
+      <div class="input-group"><label>Recherche</label><input type="text" id="filterSearch" placeholder="Référence, agence, déclarant..." oninput="renderRegistre()"></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>Référence</th><th>Date survenance</th><th>Agence</th><th>Déclarant</th><th>Sévérité</th><th>Impact (DT)</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="registre-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== ONGLET DASHBOARD ===================== -->
+  <div class="tab-panel" id="panel-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-value" id="stat-total">0</span><span class="stat-label">Incidents totaux</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-draft">0</span><span class="stat-label">Brouillons</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-submitted">0</span><span class="stat-label">Soumis</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-impact">0</span><span class="stat-label">Impact financier cumulé (DT)</span></div>
+    </div>
+    <div class="chart-box"><canvas id="type-chart" height="90"></canvas></div>
+    <div class="chart-box"><canvas id="monthly-chart" height="90"></canvas></div>
+  </div>
+
+  <!-- ===================== ONGLET AUDIT ===================== -->
+  <div class="tab-panel" id="panel-audit">
+    <p style="color:var(--muted);margin-bottom:1rem;">Traçabilité de toutes les actions effectuées sur le registre (piste d'audit).</p>
+    <div style="overflow-x:auto;">
+      <table><thead><tr><th>Horodatage</th><th>Action</th><th>Référence</th><th>Détails</th></tr></thead><tbody id="audit-body"></tbody></table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>Système Intégré de Gestion de Déclaration d'un Incident Risque Opérationnel (GDIRO)</strong><br>
+    Conforme aux exigences BCT — Circulaire n°2006-19 | Bâle II/III | RGPD<br>
+    © 2026 — Tous droits réservés
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+'use strict';
+const CONFIG = { MAX_FINANCIAL_IMPACT: 10000000, VERSION: '3.0.0' };
+const EVENT_TYPE_LABELS = {
+  'fraude-interne':'Fraude interne','fraude-externe':'Fraude externe','pratiques-emploi':"Pratiques d'emploi",
+  'clients-produits':'Clients & produits','dommages-actifs':'Dommages aux actifs','defaillance-systeme':'Défaillance système',
+  'erreur-operationnelle':'Erreur opérationnelle'
+};
+const SEVERITY_LABELS = {faible:'Faible',moyen:'Moyen',eleve:'Élevé',critique:'Critique'};
+
+let incidents = [];        // en mémoire, synchronisé avec window.storage (clé partagée)
+let auditLog = [];
+let currentIncident = null; // incident en cours d'édition (null = nouvelle déclaration)
+let typeChart, monthlyChart;
+
+// ---------------- Notifications ----------------
+function notify(message, type='info', duration=4000){
+  const area = document.getElementById('notification-area');
+  const n = document.createElement('div');
+  n.className = `notification ${type}`;
+  n.textContent = message;
+  area.appendChild(n);
+  requestAnimationFrame(()=> n.classList.add('active'));
+  if(duration>0) setTimeout(()=>{ n.classList.remove('active'); setTimeout(()=>n.remove(),300); }, duration);
+}
+
+// ---------------- Storage (persistant, partagé) ----------------
+async function loadAll(){
+  try{
+    const inc = await window.storage.get('incidents', true);
+    incidents = inc && inc.value ? JSON.parse(inc.value) : [];
+  }catch(e){ incidents = []; }
+  try{
+    const log = await window.storage.get('auditLog', true);
+    auditLog = log && log.value ? JSON.parse(log.value) : [];
+  }catch(e){ auditLog = []; }
+}
+async function persistIncidents(){
+  try{ await window.storage.set('incidents', JSON.stringify(incidents), true); }
+  catch(e){ notify("Erreur lors de l'enregistrement du registre partagé.", 'error'); }
+}
+async function persistAudit(){
+  try{ await window.storage.set('auditLog', JSON.stringify(auditLog), true); }
+  catch(e){ /* non bloquant */ }
+}
+async function logAudit(action, details={}){
+  auditLog.push({ id:`${Date.now()}-${Math.random().toString(36).slice(2,8)}`, timestamp:new Date().toISOString(), action, details });
+  if(auditLog.length>1000) auditLog.shift();
+  await persistAudit();
+  renderAudit();
+}
+
+// ---------------- Navigation onglets ----------------
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab==='registre') renderRegistre();
+    if(tab.dataset.tab==='dashboard') updateDashboard();
+    if(tab.dataset.tab==='audit') renderAudit();
+  });
+});
+function toggleSection(el){
+  el.nextElementSibling.classList.toggle('active');
+  const icon = el.querySelector('span'); icon.textContent = el.nextElementSibling.classList.contains('active') ? '▾' : '▸';
+}
+
+// ---------------- Génération référence ----------------
+function generateReference(){
+  const d = new Date();
+  const rnd = Math.floor(1000+Math.random()*9000);
+  return `IRO-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}-${rnd}`;
+}
+
+// ---------------- Formulaire : lecture / écriture ----------------
+const FIELD_IDS = ['incidentDatetime','detectionDatetime','location','declarantName','declarantFunction','declarantContact',
+  'description','processConcerned','severity','impactNature','financialImpact','recoveredAmount','causes','correctiveActions','dossierStatus'];
+
+function collectFormData(){
+  const data = {};
+  FIELD_IDS.forEach(id=> data[id] = document.getElementById(id).value);
+  data.incidentTypes = Array.from(document.querySelectorAll('#incidentTypesGroup input:checked')).map(i=>i.value);
+  return data;
+}
+function fillForm(data){
+  FIELD_IDS.forEach(id=>{ const el = document.getElementById(id); if(el) el.value = data[id] || (id==='dossierStatus'?'ouvert':(id==='impactNature'?'avere':'')); });
+  document.querySelectorAll('#incidentTypesGroup input').forEach(cb=> cb.checked = (data.incidentTypes||[]).includes(cb.value));
+}
+function clearFormErrors(){
+  document.querySelectorAll('.field-error').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.error').forEach(e=>e.classList.remove('error'));
+}
+function markError(fieldId){
+  const el = document.getElementById(fieldId);
+  if(el) el.classList.add('error');
+  const err = document.getElementById('err-'+fieldId);
+  if(err) err.classList.add('active');
+}
+function validateForm(data){
+  clearFormErrors();
+  let ok = true;
+  if(!data.incidentDatetime){ markError('incidentDatetime'); ok=false; }
+  if(!data.location || !data.location.trim()){ markError('location'); ok=false; }
+  if(!data.declarantName || !data.declarantName.trim()){ markError('declarantName'); ok=false; }
+  if(!data.description || data.description.trim().length<20){ markError('description'); ok=false; }
+  if(!data.incidentTypes || data.incidentTypes.length===0){ document.getElementById('err-incidentTypes').classList.add('active'); ok=false; }
+  if(!data.severity){ markError('severity'); ok=false; }
+  const fi = parseFloat(data.financialImpact);
+  if(data.financialImpact!=='' && (isNaN(fi) || fi<0 || fi>CONFIG.MAX_FINANCIAL_IMPACT)){ markError('financialImpact'); ok=false; }
+  return ok;
+}
+
+function updateReferenceBar(){
+  document.getElementById('ref-display').textContent = currentIncident ? currentIncident.reference : generateReference();
+  document.getElementById('status-display').textContent = currentIncident ? (currentIncident.status==='draft'?'Brouillon':'Soumis') : 'Nouvelle déclaration';
+}
+
+function newIncident(){
+  currentIncident = null;
+  FIELD_IDS.forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#incidentTypesGroup input').forEach(cb=>cb.checked=false);
+  document.getElementById('dossierStatus').value='ouvert';
+  document.getElementById('impactNature').value='avere';
+  clearFormErrors();
+  updateReferenceBar();
+  notify('Nouvelle déclaration prête.', 'info');
+}
+
+async function saveDraft(){
+  const data = collectFormData();
+  const now = new Date().toISOString();
+  if(currentIncident){
+    currentIncident.data = data; currentIncident.updatedAt = now;
+  } else {
+    currentIncident = { id:'INC-'+Date.now(), reference:generateReference(), status:'draft', data, createdAt:now, updatedAt:now };
+    incidents.push(currentIncident);
+  }
+  await persistIncidents();
+  updateReferenceBar();
+  notify('Brouillon enregistré.', 'success');
+  await logAudit('SAVE_DRAFT', { reference: currentIncident.reference });
+}
+
+async function submitIncident(){
+  const data = collectFormData();
+  if(!validateForm(data)){ notify('Veuillez corriger les champs signalés avant de soumettre.', 'error'); return; }
+  const now = new Date().toISOString();
+  if(currentIncident){
+    currentIncident.data = data; currentIncident.status='submitted'; currentIncident.updatedAt=now; currentIncident.submittedAt=now;
+  } else {
+    currentIncident = { id:'INC-'+Date.now(), reference:generateReference(), status:'submitted', data, createdAt:now, updatedAt:now, submittedAt:now };
+    incidents.push(currentIncident);
+  }
+  await persistIncidents();
+  updateReferenceBar();
+  notify(`Déclaration ${currentIncident.reference} soumise avec succès.`, 'success');
+  await logAudit('SUBMIT_INCIDENT', { reference: currentIncident.reference });
+  newIncident();
+}
+
+// ---------------- Registre ----------------
+function renderRegistre(){
+  const tbody = document.getElementById('registre-body');
+  const statusF = document.getElementById('filterStatus').value;
+  const sevF = document.getElementById('filterSeverity').value;
+  const search = (document.getElementById('filterSearch').value||'').toLowerCase();
+
+  let list = incidents.filter(inc=>{
+    if(statusF && inc.status!==statusF) return false;
+    if(sevF && inc.data.severity!==sevF) return false;
+    if(search){
+      const hay = `${inc.reference} ${inc.data.location||''} ${inc.data.declarantName||''}`.toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  }).sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
+
+  if(list.length===0){
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">Aucun incident ne correspond aux critères. Ajoutez une déclaration ou modifiez les filtres.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(inc=>{
+    const sev = inc.data.severity || '';
+    return `<tr>
+      <td><strong>${inc.reference}</strong></td>
+      <td>${inc.data.incidentDatetime ? new Date(inc.data.incidentDatetime).toLocaleString('fr-FR') : '-'}</td>
+      <td>${escapeHtml(inc.data.location||'-')}</td>
+      <td>${escapeHtml(inc.data.declarantName||'-')}</td>
+      <td>${sev ? `<span class="badge badge-${sev}">${SEVERITY_LABELS[sev]}</span>` : '-'}</td>
+      <td>${inc.data.financialImpact ? Number(inc.data.financialImpact).toLocaleString('fr-FR') : '0'}</td>
+      <td><span class="badge ${inc.status==='draft'?'badge-draft':'badge-submitted'}">${inc.status==='draft'?'Brouillon':'Soumis'}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-outline" style="padding:.35rem .6rem;" onclick="viewIncident('${inc.id}')">👁️</button>
+        <button class="btn btn-danger" style="padding:.35rem .6rem;" onclick="deleteIncident('${inc.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function refreshRegistre(){ renderRegistre(); notify('Registre actualisé.', 'info', 2000); }
+
+function viewIncident(id){
+  const inc = incidents.find(i=>i.id===id);
+  if(!inc) return;
+  currentIncident = inc;
+  fillForm(inc.data);
+  updateReferenceBar();
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.nav-tab[data-tab="declaration"]').classList.add('active');
+  document.getElementById('panel-declaration').classList.add('active');
+  document.querySelectorAll('.section-content').forEach(s=>s.classList.add('active'));
+  window.scrollTo({top:0, behavior:'smooth'});
+  notify(`Déclaration ${inc.reference} chargée pour consultation/modification.`, 'info');
+}
+
+async function deleteIncident(id){
+  const inc = incidents.find(i=>i.id===id);
+  if(!inc) return;
+  if(!confirm(`Supprimer définitivement la déclaration ${inc.reference} ?`)) return;
+  incidents = incidents.filter(i=>i.id!==id);
+  await persistIncidents();
+  renderRegistre();
+  notify('Déclaration supprimée.', 'success');
+  await logAudit('DELETE_INCIDENT', { reference: inc.reference });
+}
+
+function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+// ---------------- Dashboard ----------------
+function initCharts(){
+  typeChart = new Chart(document.getElementById('type-chart').getContext('2d'), {
+    type:'bar',
+    data:{ labels:Object.values(EVENT_TYPE_LABELS), datasets:[{label:"Nombre d'incidents", data:Array(7).fill(0), backgroundColor:'#0047ab'}] },
+    options:{ responsive:true, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+  });
+  monthlyChart = new Chart(document.getElementById('monthly-chart').getContext('2d'), {
+    type:'line',
+    data:{ labels:['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
+      datasets:[{label:'Incidents soumis par mois', data:Array(12).fill(0), borderColor:'#0047ab', backgroundColor:'rgba(0,71,171,.1)', tension:.3, fill:true}] },
+    options:{ responsive:true, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+  });
+}
+function updateDashboard(){
+  const submitted = incidents.filter(i=>i.status==='submitted');
+  const drafts = incidents.filter(i=>i.status==='draft');
+  document.getElementById('stat-total').textContent = incidents.length;
+  document.getElementById('stat-draft').textContent = drafts.length;
+  document.getElementById('stat-submitted').textContent = submitted.length;
+  const totalImpact = submitted.reduce((s,i)=> s + (parseFloat(i.data.financialImpact)||0), 0);
+  document.getElementById('stat-impact').textContent = totalImpact.toLocaleString('fr-FR');
+
+  const typeCounts = Object.keys(EVENT_TYPE_LABELS).map(()=>0);
+  const typeKeys = Object.keys(EVENT_TYPE_LABELS);
+  submitted.forEach(inc=> (inc.data.incidentTypes||[]).forEach(t=>{ const idx=typeKeys.indexOf(t); if(idx>-1) typeCounts[idx]++; }));
+  typeChart.data.datasets[0].data = typeCounts; typeChart.update();
+
+  const monthly = Array(12).fill(0);
+  submitted.forEach(inc=>{ if(inc.submittedAt) monthly[new Date(inc.submittedAt).getMonth()]++; });
+  monthlyChart.data.datasets[0].data = monthly; monthlyChart.update();
+}
+
+// ---------------- Audit ----------------
+function renderAudit(){
+  const tbody = document.getElementById('audit-body');
+  if(auditLog.length===0){ tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">Aucune entrée d'audit pour le moment.</div></td></tr>`; return; }
+  tbody.innerHTML = auditLog.slice(-100).reverse().map(e=>`
+    <tr><td>${new Date(e.timestamp).toLocaleString('fr-FR')}</td><td><strong>${e.action}</strong></td>
+    <td>${e.details.reference||'-'}</td><td>${escapeHtml(JSON.stringify(e.details))}</td></tr>`).join('');
+}
+
+// ---------------- CSV Export / Import ----------------
+function csvEsc(v){ if(v===null||v===undefined) v=''; return `"${String(v).replace(/"/g,'""')}"`; }
+const CSV_COLUMNS = ['id','reference','status','incidentDatetime','detectionDatetime','location','declarantName','declarantFunction',
+  'declarantContact','description','processConcerned','incidentTypes','severity','impactNature','financialImpact','recoveredAmount',
+  'causes','correctiveActions','dossierStatus','createdAt','updatedAt','submittedAt'];
+
+function exportCSV(){
+  const header = CSV_COLUMNS.map(csvEsc).join(';');
+  const rows = incidents.map(inc=>{
+    const row = { id:inc.id, reference:inc.reference, status:inc.status, createdAt:inc.createdAt, updatedAt:inc.updatedAt, submittedAt:inc.submittedAt||'' };
+    CSV_COLUMNS.forEach(c=>{ if(!(c in row)) row[c] = Array.isArray(inc.data[c]) ? inc.data[c].join('|') : (inc.data[c] ?? ''); });
+    return CSV_COLUMNS.map(c=>csvEsc(row[c])).join(';');
+  });
+  const csv = "\uFEFF"+[header,...rows].join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`registre_incidents_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  notify(`${incidents.length} incident(s) exporté(s) en CSV.`, 'success');
+  logAudit('EXPORT_CSV', { count: incidents.length });
+}
+
+function parseCSVLine(line){
+  const res=[]; let cur=''; let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(inQ){ if(ch==='"'){ if(line[i+1]==='"'){cur+='"';i++;} else inQ=false; } else cur+=ch; }
+    else { if(ch==='"') inQ=true; else if(ch===';'){res.push(cur);cur='';} else cur+=ch; }
+  }
+  res.push(cur); return res;
+}
+
+function handleImportFile(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    try{ await importCSV(e.target.result); }
+    catch(err){ console.error(err); notify("Erreur lors de la lecture du fichier CSV.", 'error'); }
+  };
+  reader.onerror = ()=> notify('Impossible de lire le fichier.', 'error');
+  reader.readAsText(file, 'UTF-8');
+  evt.target.value='';
+}
+
+async function importCSV(text){
+  text = text.replace(/^\uFEFF/, '');
+  const lines = text.split(/\r\n|\n/).filter(l=>l.trim()!=='');
+  if(lines.length<2){ notify('Fichier CSV vide ou invalide.', 'error'); return; }
+  const header = parseCSVLine(lines[0]);
+  let added=0, updated=0;
+
+  for(let i=1;i<lines.length;i++){
+    const cells = parseCSVLine(lines[i]);
+    const row = {};
+    header.forEach((h,idx)=> row[h] = cells[idx] !== undefined ? cells[idx] : '');
+    if(!row.reference) continue;
+
+    const data = {};
+    CSV_COLUMNS.forEach(c=>{
+      if(['id','reference','status','createdAt','updatedAt','submittedAt'].includes(c)) return;
+      data[c] = c==='incidentTypes' ? (row[c] ? row[c].split('|').filter(Boolean) : []) : (row[c]||'');
+    });
+
+    const existing = incidents.find(inc=> inc.reference === row.reference);
+    if(existing){
+      existing.data = data; existing.status = row.status || existing.status; existing.updatedAt = new Date().toISOString();
+      updated++;
+    } else {
+      incidents.push({
+        id: row.id || ('INC-'+Date.now()+'-'+i),
+        reference: row.reference,
+        status: row.status || 'draft',
+        data,
+        createdAt: row.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        submittedAt: row.submittedAt || null
+      });
+      added++;
+    }
+  }
+  await persistIncidents();
+  renderRegistre();
+  updateDashboard();
+  notify(`Import terminé : ${added} ajouté(s), ${updated} mis à jour.`, 'success');
+  await logAudit('IMPORT_CSV', { added, updated });
+}
+
+// ---------------- Initialisation ----------------
+async function init(){
+  try{
+    await loadAll();
+    initCharts();
+    newIncident();
+    renderRegistre();
+    updateDashboard();
+    renderAudit();
+    await logAudit('SYSTEM_INIT', { version: CONFIG.VERSION });
+  }catch(e){
+    console.error(e);
+    notify("Erreur d'initialisation. Actualisez la page.", 'error', 0);
+  }finally{
+    document.getElementById('loadingOverlay').style.display='none';
+  }
+}
+init();
+</script>
+</body>
+</html>
